@@ -19,7 +19,7 @@
         /* Quiz Elements */
         .progress-bar { width: 100%; background: #e0e0e0; border-radius: 10px; height: 10px; margin-bottom: 20px; }
         .progress-fill { height: 10px; background: var(--success); border-radius: 10px; width: 0%; transition: 0.3s; }
-        .question-img { max-width: 100%; border-radius: 10px; margin-bottom: 15px; display: none; }
+        .question-img { max-width: 100%; border-radius: 10px; margin-bottom: 15px; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         .options-grid { display: grid; gap: 10px; }
         .option-btn { padding: 15px; border: 2px solid var(--primary); background: white; color: var(--text); border-radius: 8px; cursor: pointer; font-size: 16px; transition: 0.2s; }
         .option-btn:hover { background: #e6f0fa; }
@@ -39,7 +39,7 @@
     <!-- Main Menu -->
     <div id="view-menu">
         <h1>Matematik Tahun 3</h1>
-        <h2>Tambah & Tolak Wang</h2>
+        <h2>Tambah & Tolak Wang (Format KPM)</h2>
         <button class="btn" onclick="showView('view-murid')">Mod Murid</button>
         <button class="btn btn-secondary" onclick="showView('view-guru')">Mod Guru</button>
     </div>
@@ -78,7 +78,10 @@
     <div id="view-quiz" class="hidden">
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
         <p>Soalan <span id="qCurrent">1</span> daripada <span id="qTotal">30</span> | Skor: <span id="scoreDisplay">0</span></p>
-        <img id="qImage" class="question-img" src="" alt="Soalan Gambar">
+        
+        <!-- ELEMENT GAMBAR DITAMBAH DI SINI -->
+        <img id="qImage" class="question-img" src="" alt="Gambar Rangsangan Soalan">
+        
         <h3 id="qText">Soalan akan dipaparkan di sini</h3>
         <div id="optionsArea" class="options-grid"></div>
         <div id="feedbackArea" class="feedback"></div>
@@ -113,45 +116,152 @@
 <script>
     const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzrnsB95vAn9hQdq6nHm3bFji6QUqHtG6k4JKkilO-uPKG7TgNh3RZrANmpzsCXPP3POA/exec"; 
 
-    const questions = [
-        { type: "mcq", q: "Berapakah hasil tambah RM 15.50 dan RM 12.00?", options: ["RM 27.50", "RM 25.50", "RM 28.00", "RM 27.00"], answer: "RM 27.50", explanation: "RM 15.50 + RM 12.00 = RM 27.50. Tambahkan sen dahulu, kemudian ringgit.", topic: "Tambah Wang" },
-        { type: "tf", q: "Betul atau Salah: RM 50.00 tolak RM 15.50 ialah RM 35.50.", options: ["Betul", "Salah"], answer: "Salah", explanation: "Salah. RM 50.00 - RM 15.50 = RM 34.50. Pastikan anda pinjam dari bahagian ringgit dengan betul.", topic: "Tolak Wang" },
-        { type: "scenario", q: "Ali ada RM 100. Dia membeli beg sekolah berharga RM 45.90. Berapakah baki wangnya?", options: ["RM 44.10", "RM 54.10", "RM 55.10", "RM 64.10"], answer: "RM 54.10", explanation: "RM 100.00 - RM 45.90 = RM 54.10. ", topic: "Tolak Wang (Penyelesaian Masalah)" },
-        { type: "mcq", q: "Cari beza antara RM 89.20 dan RM 34.80", options: ["RM 54.40", "RM 55.40", "RM 54.60", "RM 124.00"], answer: "RM 54.40", explanation: "Tolak nilai kecil dari nilai besar: RM 89.20 - RM 34.80 = RM 54.40.", topic: "Tolak Wang" },
-        { type: "mcq", q: "Tambahkan RM 125.60, RM 40.00 dan RM 15.20", options: ["RM 180.80", "RM 170.80", "RM 180.00", "RM 160.80"], answer: "RM 180.80", explanation: "Susun dalam bentuk lazim dan tambah titik perpuluhan sebaris. Hasilnya RM 180.80.", topic: "Tambah Wang Berturut-turut" }
-    ];
-
-    for(let i=6; i<=30; i++) {
+    // SEDIAKAN 30 SOALAN (LALAI)
+    const questions = [];
+    for(let i=1; i<=30; i++) {
         questions.push({
-            type: i%2===0 ? "mcq" : "tf",
-            q: `Latihan Soalan ${i}: Tambah dan Tolak wang asas. Selesaikan RM ${i+10}.00 + RM 5.50`,
-            options: i%2===0 ? [`RM ${i+15}.50`, `RM ${i+16}.50`, "RM 10.00", "RM 0.00"] : ["Betul", "Salah"],
-            answer: i%2===0 ? `RM ${i+15}.50` : "Salah",
-            explanation: `Penerangan untuk soalan ${i}. Konsep asas operasi wang.`,
-            topic: "Latihan Campuran Wang"
+            type: "mcq",
+            q: `Latihan Soalan ${i}: Selesaikan operasi asas wang: RM ${i+10}.00 + RM 5.50`,
+            options: [`RM ${i+15}.50`, `RM ${i+16}.50`, "RM 10.00", "RM 0.00"],
+            answer: `RM ${i+15}.50`,
+            explanation: `Penerangan untuk soalan asas nombor ${i}.`,
+            topic: "Latihan Asas Wang"
         });
     }
 
+    // GANTIKAN SOALAN 1 HINGGA 4 DENGAN SOALAN ASAL CIKGU
+    questions[0] = { type: "mcq", q: "Berapakah hasil tambah RM 15.50 dan RM 12.00?", options: ["RM 27.50", "RM 25.50", "RM 28.00", "RM 27.00"], answer: "RM 27.50", explanation: "RM 15.50 + RM 12.00 = RM 27.50.", topic: "Tambah Wang" };
+    questions[1] = { type: "mcq", q: "Pilih pernyataan yang betul:", options: ["RM 50.00 - RM 15.50 = RM 34.50", "RM 50.00 - RM 15.50 = RM 35.50", "RM 10.00 + RM 5.00 = RM 25.00", "RM 20.00 - RM 5.00 = RM 10.00"], answer: "RM 50.00 - RM 15.50 = RM 34.50", explanation: "Semak semula baki dan titik perpuluhan.", topic: "Tolak Wang" };
+    questions[2] = { type: "mcq", q: "Ali ada RM 100. Dia membeli beg sekolah berharga RM 45.90. Berapakah baki wangnya?", options: ["RM 54.10", "RM 44.10", "RM 55.10", "RM 64.10"], answer: "RM 54.10", explanation: "RM 100.00 - RM 45.90 = RM 54.10.", topic: "Penyelesaian Masalah (Tolak)" };
+    questions[3] = { type: "mcq", q: "Cari beza antara RM 89.20 dan RM 34.80", options: ["RM 54.40", "RM 55.40", "RM 54.60", "RM 124.00"], answer: "RM 54.40", explanation: "RM 89.20 - RM 34.80 = RM 54.40.", topic: "Tolak Wang" };
+
+    // --- KOD BAHARU: SOALAN KBAT & BERGAMBAR FORMAT KPM ---
+    
+    // Soalan 5 (Index 4)
+    questions[4] = { 
+        type: "mcq", q: "Rajah menunjukkan harga tiga jenis barang di sebuah kedai. Berapakah jumlah harga bagi ketiga-tiga barang tersebut?", 
+        image: "https://dummyimage.com/600x200/4A90E2/ffffff&text=Baju:+RM39.90+|+Kasut:+RM55.20+|+Topi:+RM15.50",
+        options: ["RM 110.60", "RM 100.60", "RM 111.60", "RM 101.60"], answer: "RM 110.60", 
+        explanation: "Penyelesaian: RM 39.90 + RM 55.20 + RM 15.50 = RM 110.60.", topic: "Penyelesaian Masalah (Tambah)" 
+    };
+
+    // Soalan 7 (Index 6)
+    questions[6] = { 
+        type: "mcq", q: "Aina membawa wang seperti di dalam rajah ke kedai kek. Selepas membeli kek tersebut, berapakah baki wangnya?", 
+        image: "https://dummyimage.com/600x200/FF6B6B/ffffff&text=Wang+Tunai:+RM100+|+Harga+Kek:+RM45.50",
+        options: ["RM 54.50", "RM 44.50", "RM 64.50", "RM 55.50"], answer: "RM 54.50", 
+        explanation: "Penyelesaian: RM 100.00 - RM 45.50 = RM 54.50.", topic: "Penyelesaian Masalah (Tolak)" 
+    };
+
+    // Soalan 9 (Index 8)
+    questions[8] = { 
+        type: "mcq", q: "Berdasarkan resit di atas, berapakah jumlah yang perlu dibayar oleh ibu?", 
+        image: "https://dummyimage.com/600x200/2ECC71/ffffff&text=Resit:+Buku(RM12.00),+Alat+Tulis(RM8.50),+Warna(RM15.90)",
+        options: ["RM 36.40", "RM 35.40", "RM 46.40", "RM 37.40"], answer: "RM 36.40", 
+        explanation: "Penyelesaian: RM 12.00 + RM 8.50 + RM 15.90 = RM 36.40.", topic: "Penyelesaian Masalah (Tambah)" 
+    };
+
+    // Soalan 11 (Index 10)
+    questions[10] = { 
+        type: "mcq", q: "Berapakah perbezaan harga di antara Basikal A dan Basikal B?", 
+        image: "https://dummyimage.com/600x200/9B59B6/ffffff&text=Basikal+A:+RM120.50+|+Basikal+B:+RM95.00",
+        options: ["RM 25.50", "RM 35.50", "RM 20.50", "RM 15.50"], answer: "RM 25.50", 
+        explanation: "Kata kunci 'perbezaan' bermaksud tolak. RM 120.50 - RM 95.00 = RM 25.50.", topic: "Penyelesaian Masalah (Tolak)" 
+    };
+
+    // Soalan 13 (Index 12)
+    questions[12] = { 
+        type: "mcq", q: "Sempena Hari Guru, kedai buku memberikan diskaun bagi beg di atas. Berapakah harga baru beg tersebut?", 
+        image: "https://dummyimage.com/600x200/F39C12/ffffff&text=Harga+Asal:+RM75.90+|+Diskaun:+RM10.00",
+        options: ["RM 65.90", "RM 85.90", "RM 74.90", "RM 66.90"], answer: "RM 65.90", 
+        explanation: "Diskaun bermaksud potongan harga (tolak). RM 75.90 - RM 10.00 = RM 65.90.", topic: "Penyelesaian Masalah (Tolak)" 
+    };
+
+    // Soalan 15 (Index 14)
+    questions[14] = { 
+        type: "mcq", q: "Ayah memesan makanan berdasarkan menu di atas. Berapakah jumlah harga untuk pesanan ayah?", 
+        image: "https://dummyimage.com/600x200/E67E22/ffffff&text=Menu:+Nasi+Ayam(RM6.50)+|+Jus+Epal(RM3.50)",
+        options: ["RM 10.00", "RM 9.00", "RM 11.00", "RM 9.50"], answer: "RM 10.00", 
+        explanation: "Penyelesaian: RM 6.50 + RM 3.50 = RM 10.00.", topic: "Penyelesaian Masalah (Tambah)" 
+    };
+
+    // Soalan 17 (Index 16)
+    questions[16] = { 
+        type: "mcq", q: "Rajah menunjukkan wang simpanan Adam. Dia telah menderma RM 35.50 ke tabung masjid. Berapakah baki simpanannya sekarang?", 
+        image: "https://dummyimage.com/600x200/34495E/ffffff&text=Simpanan+Adam:+RM150.00",
+        options: ["RM 114.50", "RM 124.50", "RM 115.50", "RM 104.50"], answer: "RM 114.50", 
+        explanation: "Penyelesaian: RM 150.00 - RM 35.50 = RM 114.50.", topic: "Penyelesaian Masalah (Tolak)" 
+    };
+
+    // Soalan 21 (Index 20)
+    questions[20] = { 
+        type: "mcq", q: "Keluarga Zaki menerima dua bil utiliti bulan ini. Kira jumlah keseluruhan bil tersebut.", 
+        image: "https://dummyimage.com/600x200/16A085/ffffff&text=Bil+Elektrik:+RM85.40+|+Bil+Air:+RM21.20",
+        options: ["RM 106.60", "RM 105.60", "RM 116.60", "RM 106.20"], answer: "RM 106.60", 
+        explanation: "Penyelesaian: RM 85.40 + RM 21.20 = RM 106.60.", topic: "Penyelesaian Masalah (Tambah)" 
+    };
+
+    // Soalan 23 (Index 22)
+    questions[22] = { 
+        type: "mcq", q: "Ibu membeli barangan dapur berjumlah RM 134.80. Ibu membayar menggunakan wang seperti di atas. Berapakah baki yang akan diterima ibu?", 
+        image: "https://dummyimage.com/600x200/8E44AD/ffffff&text=Wang+Bayaran:+3+Keping+Nota+RM+50",
+        options: ["RM 15.20", "RM 25.20", "RM 16.20", "RM 14.20"], answer: "RM 15.20", 
+        explanation: "Jumlah wang ibu: RM 50 x 3 = RM 150. Baki: RM 150.00 - RM 134.80 = RM 15.20.", topic: "Penyelesaian Masalah (Tolak KBAT)" 
+    };
+
+    // Soalan 25 (Index 24)
+    questions[24] = { 
+        type: "mcq", q: "Ahmad ingin membeli sebuah drone mainan tetapi wangnya tidak mencukupi. Berapakah wang yang masih diperlukannya?", 
+        image: "https://dummyimage.com/600x200/2980B9/ffffff&text=Drone:+RM180.00+|+Wang+Ahmad:+RM125.50",
+        options: ["RM 54.50", "RM 44.50", "RM 64.50", "RM 55.50"], answer: "RM 54.50", 
+        explanation: "Perlu cari beza. RM 180.00 - RM 125.50 = RM 54.50.", topic: "Penyelesaian Masalah (Tolak KBAT)" 
+    };
+
+    // Soalan 27 (Index 26)
+    questions[26] = { 
+        type: "mcq", q: "Kedai ABC mengadakan promosi Set Alat Tulis. Jika Lina membeli Set Promosi, berapakah wang yang dapat dijimatkan berbanding membeli secara berasingan?", 
+        image: "https://dummyimage.com/600x200/D35400/ffffff&text=Set+Promosi:+RM25.00+|+Harga+Asing:+RM30.00",
+        options: ["RM 5.00", "RM 10.00", "RM 4.00", "RM 5.50"], answer: "RM 5.00", 
+        explanation: "Jimat bermaksud beza harga. RM 30.00 - RM 25.00 = RM 5.00.", topic: "Penyelesaian Masalah (Tolak KBAT)" 
+    };
+
+    // Soalan 29 (Index 28)
+    questions[28] = { 
+        type: "mcq", q: "Kira jumlah nilai wang yang ditunjukkan di atas.", 
+        image: "https://dummyimage.com/600x200/27AE60/ffffff&text=1xRM100+|+1xRM50+|+2xRM20+|+2x50sen",
+        options: ["RM 191.00", "RM 190.00", "RM 181.00", "RM 171.00"], answer: "RM 191.00", 
+        explanation: "RM 100 + RM 50 + RM 40 + RM 1 = RM 191.00.", topic: "Kenali Wang (KPM)" 
+    };
+
+    // --- VARIABLES ---
     let currentQIndex = 0;
     let score = 0;
-    let studentData = {};
-    let mistakes = [];
+    let wrongAnswers = []; 
 
+    // --- VIEW CONTROLLER ---
     function showView(viewId) {
-        document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+        document.getElementById('view-menu').classList.add('hidden');
+        document.getElementById('view-murid').classList.add('hidden');
+        document.getElementById('view-guru').classList.add('hidden');
+        document.getElementById('view-quiz').classList.add('hidden');
+        document.getElementById('view-results').classList.add('hidden');
+        document.getElementById('view-dashboard').classList.add('hidden');
         document.getElementById(viewId).classList.remove('hidden');
     }
 
     function startQuiz() {
         const name = document.getElementById('studentName').value;
-        const cls = document.getElementById('studentClass').value;
-        if (!name) return alert("Sila masukkan nama anda!");
+        if(name.trim() === "") { alert("Sila masukkan nama anda!"); return; }
         
-        studentData = { nama: name, kelas: cls, skor: 0, peratus: 0, topik: "" };
-        currentQIndex = 0; score = 0; mistakes = [];
-        document.getElementById('scoreDisplay').innerText = score;
-        document.getElementById('qTotal').innerText = questions.length;
+        // Shuffle questions
+        for (let i = questions.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [questions[i], questions[j]] = [questions[j], questions[i]];
+        }
         
+        currentQIndex = 0;
+        score = 0;
+        wrongAnswers = [];
         showView('view-quiz');
         renderQuestion();
     }
@@ -164,60 +274,73 @@
         const progress = ((currentQIndex) / questions.length) * 100;
         document.getElementById('progressFill').style.width = `${progress}%`;
 
+        // KOD KAWALAN GAMBAR: Tunjuk jika ada, sembunyi jika tiada
+        const qImage = document.getElementById('qImage');
+        if (q.image) {
+            qImage.src = q.image;
+            qImage.style.display = 'block';
+        } else {
+            qImage.style.display = 'none';
+        }
+
         const optionsArea = document.getElementById('optionsArea');
         optionsArea.innerHTML = '';
         
-        // --- KOD BAHARU: RAWAKKAN SUSUNAN JAWAPAN ---
-        // Salin jawapan asal supaya array tak rosak
-        let shuffledOptions = [...q.options];
-        // Goncang array (Fisher-Yates Shuffle)
-        for (let i = shuffledOptions.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
-        }
+        const feedbackArea = document.getElementById('feedbackArea');
+        feedbackArea.style.display = 'none';
+        feedbackArea.className = 'feedback';
         
-        // Gunakan jawapan yang telah dirawakkan untuk buat butang
-        shuffledOptions.forEach(opt => {
+        document.getElementById('nextBtn').style.display = 'none';
+
+        // Shuffle options (for MCQ)
+        let optionsToRender = [...q.options];
+        if(q.type === "mcq") {
+            for (let i = optionsToRender.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [optionsToRender[i], optionsToRender[j]] = [optionsToRender[j], optionsToRender[i]];
+            }
+        }
+
+        optionsToRender.forEach(opt => {
             const btn = document.createElement('button');
             btn.className = 'option-btn';
             btn.innerText = opt;
             btn.onclick = () => checkAnswer(opt, btn);
             optionsArea.appendChild(btn);
         });
-        // ----------------------------------------------
-
-        const feedback = document.getElementById('feedbackArea');
-        feedback.style.display = 'none';
-        document.getElementById('nextBtn').style.display = 'none';
     }
 
     function checkAnswer(selected, btn) {
         const q = questions[currentQIndex];
-        const feedback = document.getElementById('feedbackArea');
-        const optionsArea = document.getElementById('optionsArea');
+        const feedbackArea = document.getElementById('feedbackArea');
         
-        Array.from(optionsArea.children).forEach(b => b.disabled = true);
+        // Disable all buttons after clicking
+        const allBtns = document.querySelectorAll('.option-btn');
+        allBtns.forEach(b => b.disabled = true);
 
-        if (selected === q.answer) {
+        feedbackArea.style.display = 'block';
+
+        if(selected === q.answer) {
+            btn.style.backgroundColor = '#d4edda';
+            btn.style.borderColor = '#c3e6cb';
+            feedbackArea.classList.add('correct');
+            feedbackArea.innerHTML = `<strong>Tepat!</strong> ${q.explanation}`;
             score++;
-            document.getElementById('scoreDisplay').innerText = score;
-            btn.style.background = '#d4edda';
-            feedback.className = 'feedback correct';
-            feedback.innerHTML = `<strong>Tepat!</strong> ${q.explanation}`;
         } else {
-            mistakes.push(q.topic);
-            btn.style.background = '#f8d7da';
-            feedback.className = 'feedback incorrect';
-            feedback.innerHTML = `<strong>Kurang Tepat.</strong> Jawapan yang betul ialah ${q.answer}.<br><br><em>Klu: ${q.explanation}</em>`;
+            btn.style.backgroundColor = '#f8d7da';
+            btn.style.borderColor = '#f5c6cb';
+            feedbackArea.classList.add('incorrect');
+            feedbackArea.innerHTML = `<strong>Salah.</strong> Jawapan yang betul ialah <u>${q.answer}</u>. ${q.explanation}`;
+            wrongAnswers.push(q.topic);
         }
-        
-        feedback.style.display = 'block';
+
+        document.getElementById('scoreDisplay').innerText = score;
         document.getElementById('nextBtn').style.display = 'block';
     }
 
     function nextQuestion() {
         currentQIndex++;
-        if (currentQIndex < questions.length) {
+        if(currentQIndex < questions.length) {
             renderQuestion();
         } else {
             endQuiz();
@@ -225,101 +348,83 @@
     }
 
     function endQuiz() {
+        const name = document.getElementById('studentName').value;
+        const kelas = document.getElementById('studentClass').value;
         const percent = Math.round((score / questions.length) * 100);
-        studentData.skor = score;
-        studentData.peratus = percent;
         
-        const topMistake = mistakes.length > 0 ? mistakes.sort((a,b) =>
-            mistakes.filter(v => v===a).length - mistakes.filter(v => v===b).length
-        ).pop() : "Tiada (Sangat Cemerlang)";
-        
-        studentData.topik = topMistake;
-
-        document.getElementById('resName').innerText = studentData.nama;
+        document.getElementById('resName').innerText = name;
         document.getElementById('resScore').innerText = score;
         document.getElementById('resPercent').innerText = percent;
-        
-        let msg = percent >= 80 ? "Hebat! Teruskan usaha cemerlang anda." :
-                  percent >= 50 ? "Tahniah! Anda boleh buat lebih baik dengan sedikit latihan tambahan." :
-                  "Jangan putus asa! Mari ulangkaji semula bahagian ini.";
-        
-        document.getElementById('resSummary').innerHTML = `
-            <p>${msg}</p>
-            <p><strong>Cadangan Semakan:</strong> Anda dinasihatkan untuk memberi fokus kepada topik: <em>${topMistake}</em>.</p>
-        `;
 
-        saveToGoogleSheet(studentData);
+        // Tentukan topik lemah
+        let summaryText = "Tahniah kerana menyiapkan kuiz!";
+        if(wrongAnswers.length > 0) {
+            const counts = {};
+            wrongAnswers.forEach(x => counts[x] = (counts[x] || 0) + 1);
+            const weakestTopic = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
+            summaryText = `Cikgu sarankan anda buat lebih ulang kaji pada topik: <strong>${weakestTopic}</strong>.`;
+        } else {
+            summaryText = "Sempurna! Penguasaan wang anda sangat cemerlang.";
+        }
+        document.getElementById('resSummary').innerHTML = summaryText;
+
+        saveDataGoogleSheet(name, kelas, score, percent, summaryText);
         showView('view-results');
     }
 
-    function saveToGoogleSheet(data) {
-        let allData = JSON.parse(localStorage.getItem('kuizData') || '[]');
-        allData.push(data);
-        localStorage.setItem('kuizData', JSON.stringify(allData));
+    // --- GOOGLE SHEETS INTEGRATION ---
+    function saveDataGoogleSheet(name, kelas, score, percent, remarks) {
+        if(!GOOGLE_SHEET_WEBAPP_URL) return;
+        const formData = new URLSearchParams();
+        formData.append("action", "save");
+        formData.append("nama", name);
+        formData.append("kelas", kelas);
+        formData.append("skor", score);
+        formData.append("peratus", percent);
+        formData.append("nota", remarks);
 
-        fetch(GOOGLE_SHEET_WEBAPP_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            body: JSON.stringify(data),
-            headers: { 
-                'Content-Type': 'text/plain;charset=utf-8' 
-            }
-        }).then(() => {
-            console.log('Arahan hantar ke Google Sheets telah dijalankan');
-        }).catch(e => console.log('Ralat penghantaran', e));
-    }
-
-    function loginGuru() {
-        const pwd = document.getElementById('guruPassword').value;
-        if (pwd === '8888') {
-            document.getElementById('guruPassword').value = '';
-            showView('view-dashboard');
-            loadDashboardData();
-        } else {
-            alert('Kata laluan salah!');
-        }
-    }
-
-    function loadDashboardData() {
-        const tbody = document.getElementById('guruTableBody');
-        tbody.innerHTML = '';
-        let allData = JSON.parse(localStorage.getItem('kuizData') || '[]');
-        
-        if (allData.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Belum ada data murid direkodkan.</td></tr>';
-            return;
-        }
-
-        allData.forEach(d => {
-            let row = `<tr>
-                <td>${d.nama}</td>
-                <td>${d.kelas}</td>
-                <td>${d.skor}/30</td>
-                <td>${d.peratus}%</td>
-                <td>${d.topik}</td>
-            </tr>`;
-            tbody.innerHTML += row;
-        });
+        fetch(GOOGLE_SHEET_WEBAPP_URL, { method: "POST", body: formData })
+        .then(res => res.text())
+        .then(data => console.log("Data disimpan:", data))
+        .catch(err => console.error("Error:", err));
     }
 
     function loadDataGoogleSheet() {
-        fetch(GOOGLE_SHEET_WEBAPP_URL)
+        if(!GOOGLE_SHEET_WEBAPP_URL) {
+            alert("URL Google Sheet belum dimasukkan di dalam kod.");
+            return;
+        }
+        document.getElementById('guruTableBody').innerHTML = "<tr><td colspan='5'>Memuat turun data... Sila tunggu.</td></tr>";
+        
+        fetch(`${GOOGLE_SHEET_WEBAPP_URL}?action=load`)
         .then(res => res.json())
         .then(data => {
             const tbody = document.getElementById('guruTableBody');
             tbody.innerHTML = '';
-            for(let i=1; i<data.length; i++){
-                let row = `<tr>
-                    <td>${data[i][1]}</td>
-                    <td>${data[i][2]}</td>
-                    <td>${data[i][3]}</td>
-                    <td>${data[i][4]}</td>
-                    <td>${data[i][5]}</td>
-                </tr>`;
-                tbody.innerHTML += row;
+            if(data.length === 0) {
+                tbody.innerHTML = "<tr><td colspan='5'>Belum ada data murid.</td></tr>";
+                return;
             }
+            data.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td>${row.nama}</td><td>${row.kelas}</td><td>${row.skor} / 30</td><td>${row.peratus}%</td><td>${row.nota}</td>`;
+                tbody.appendChild(tr);
+            });
         })
-        .catch(e => alert('Gagal memuat turun data. Pastikan CORS dan URL Web App betul.'));
+        .catch(err => {
+            console.error("Error:", err);
+            document.getElementById('guruTableBody').innerHTML = "<tr><td colspan='5' style='color:red'>Ralat memuat turun data.</td></tr>";
+        });
+    }
+
+    function loginGuru() {
+        const pass = document.getElementById('guruPassword').value;
+        if(pass === "cikgu123") {
+            showView('view-dashboard');
+            loadDataGoogleSheet();
+        } else {
+            alert("Kata laluan salah!");
+        }
     }
 </script>
 </body>
