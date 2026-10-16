@@ -111,20 +111,16 @@
 </div>
 
 <script>
-    // URL Web App Google Apps Script anda (Gantikan URL ini)
     const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzrnsB95vAn9hQdq6nHm3bFji6QUqHtG6k4JKkilO-uPKG7TgNh3RZrANmpzsCXPP3POA/exec"; 
 
-    // Bank Soalan (Satu himpunan contoh soalan mengikut keperluan. Sebahagian untuk demo, format menyokong sehingga 30 soalan)
     const questions = [
         { type: "mcq", q: "Berapakah hasil tambah RM 15.50 dan RM 12.00?", options: ["RM 27.50", "RM 25.50", "RM 28.00", "RM 27.00"], answer: "RM 27.50", explanation: "RM 15.50 + RM 12.00 = RM 27.50. Tambahkan sen dahulu, kemudian ringgit.", topic: "Tambah Wang" },
         { type: "tf", q: "Betul atau Salah: RM 50.00 tolak RM 15.50 ialah RM 35.50.", options: ["Betul", "Salah"], answer: "Salah", explanation: "Salah. RM 50.00 - RM 15.50 = RM 34.50. Pastikan anda pinjam dari bahagian ringgit dengan betul.", topic: "Tolak Wang" },
         { type: "scenario", q: "Ali ada RM 100. Dia membeli beg sekolah berharga RM 45.90. Berapakah baki wangnya?", options: ["RM 44.10", "RM 54.10", "RM 55.10", "RM 64.10"], answer: "RM 54.10", explanation: "RM 100.00 - RM 45.90 = RM 54.10. ", topic: "Tolak Wang (Penyelesaian Masalah)" },
         { type: "mcq", q: "Cari beza antara RM 89.20 dan RM 34.80", options: ["RM 54.40", "RM 55.40", "RM 54.60", "RM 124.00"], answer: "RM 54.40", explanation: "Tolak nilai kecil dari nilai besar: RM 89.20 - RM 34.80 = RM 54.40.", topic: "Tolak Wang" },
         { type: "mcq", q: "Tambahkan RM 125.60, RM 40.00 dan RM 15.20", options: ["RM 180.80", "RM 170.80", "RM 180.00", "RM 160.80"], answer: "RM 180.80", explanation: "Susun dalam bentuk lazim dan tambah titik perpuluhan sebaris. Hasilnya RM 180.80.", topic: "Tambah Wang Berturut-turut" }
-        // Di dalam versi sebenar, anda boleh menambah senarai array ini sehingga 30 soalan dengan format yang sama.
     ];
 
-    // Auto-generate baki soalan untuk mencukupkan 30 (Hanya untuk demonstrasi kod)
     for(let i=6; i<=30; i++) {
         questions.push({
             type: i%2===0 ? "mcq" : "tf",
@@ -165,7 +161,6 @@
         document.getElementById('qCurrent').innerText = currentQIndex + 1;
         document.getElementById('qText').innerText = q.q;
         
-        // Kemaskini Progress Bar
         const progress = ((currentQIndex) / questions.length) * 100;
         document.getElementById('progressFill').style.width = `${progress}%`;
 
@@ -190,7 +185,6 @@
         const feedback = document.getElementById('feedbackArea');
         const optionsArea = document.getElementById('optionsArea');
         
-        // Disable semua butang selepas pilih
         Array.from(optionsArea.children).forEach(b => b.disabled = true);
 
         if (selected === q.answer) {
@@ -224,7 +218,6 @@
         studentData.skor = score;
         studentData.peratus = percent;
         
-        // Cari topik yang paling banyak salah
         const topMistake = mistakes.length > 0 ? mistakes.sort((a,b) =>
             mistakes.filter(v => v===a).length - mistakes.filter(v => v===b).length
         ).pop() : "Tiada (Sangat Cemerlang)";
@@ -249,15 +242,13 @@
     }
 
     function saveToGoogleSheet(data) {
-        // Simpan dalam local storage sebagai backup
         let allData = JSON.parse(localStorage.getItem('kuizData') || '[]');
         allData.push(data);
         localStorage.setItem('kuizData', JSON.stringify(allData));
 
-        // Hantar ke Google Sheets secara terus
         fetch(GOOGLE_SHEET_WEBAPP_URL, {
             method: 'POST',
-            mode: 'no-cors', // Penting untuk elak sekatan browser telefon
+            mode: 'no-cors',
             body: JSON.stringify(data),
             headers: { 
                 'Content-Type': 'text/plain;charset=utf-8' 
@@ -301,17 +292,11 @@
     }
 
     function loadDataGoogleSheet() {
-        if(GOOGLE_SHEET_WEBAPP_URL === "https://script.google.com/macros/s/AKfycbzrnsB95vAn9hQdq6nHm3bFji6QUqHtG6k4JKkilO-uPKG7TgNh3RZrANmpzsCXPP3POA/exec") {
-            alert("Sila masukkan Web App URL Google Apps Script di dalam fail kod HTML anda terlebih dahulu.");
-            return;
-        }
-        
         fetch(GOOGLE_SHEET_WEBAPP_URL)
         .then(res => res.json())
         .then(data => {
             const tbody = document.getElementById('guruTableBody');
             tbody.innerHTML = '';
-            // Anggap baris 0 adalah header
             for(let i=1; i<data.length; i++){
                 let row = `<tr>
                     <td>${data[i][1]}</td>
