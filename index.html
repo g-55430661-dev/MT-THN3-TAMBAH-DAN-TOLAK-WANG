@@ -254,13 +254,18 @@
         allData.push(data);
         localStorage.setItem('kuizData', JSON.stringify(allData));
 
-        // Hantar ke Google Sheets jika URL diletakkan
-        if(GOOGLE_SHEET_WEBAPP_URL !== "MASUKKAN_WEB_APP_URL_ANDA_DI_SINI") {
+        // Hantar ke Google Sheets
+        if(GOOGLE_SHEET_WEBAPP_URL !== "https://script.google.com/a/macros/moe-dl.edu.my/s/AKfycbxVMV0GKmN8uIEZgRs_QJmdJ4Esnh8qZgZC-mro8ZmCn2K6YPfg9nG_lTbxJkbnep2i/exec") {
             fetch(GOOGLE_SHEET_WEBAPP_URL, {
                 method: 'POST',
+                mode: 'no-cors', // Penting untuk elak sekatan browser telefon
                 body: JSON.stringify(data),
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-            }).catch(e => console.log('Google Sheet save error', e));
+                headers: { 
+                    'Content-Type': 'text/plain;charset=utf-8' 
+                }
+            }).then(() => {
+                console.log('Berjaya hantar ke Google Sheets');
+            }).catch(e => console.log('Ralat penghantaran', e));
         }
     }
 
